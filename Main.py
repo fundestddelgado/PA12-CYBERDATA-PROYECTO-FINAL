@@ -93,7 +93,7 @@ while goku:
     match opcion:
         case "1":
             train_ds, val_ds = cargar_dataset(PATH)
-            modelo=crear_modelo(20)
+            modelo=crear_modelo(15)
             entrenar_modelo(modelo, train_ds, val_ds,"modelo_marca")
             
 
