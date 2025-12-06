@@ -179,7 +179,7 @@ while goku:
               continue
              imagen=input("Elije la imagen para predecir")
              img = tf.keras.preprocessing.image.load_img(imagen, target_size=(224,224))
-             img = tf.keras.preprocessing.image.img_to_array(img)/255.0
+             img = tf.keras.preprocessing.image.img_to_array(img)
 
              img = preprocess_input(img) 
 
