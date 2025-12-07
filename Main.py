@@ -136,7 +136,37 @@ def entrenar_modelo(model, train_ds, val_ds,class_names,nombre):
 
 
 
+def buscar(modelo_marca,marcas,lista_imagenes,objetivo_marca):
+   objetivo_idx1 = marcas.index(objetivo_marca)
+   resultados=[]
+   if objetivo_marca not in marcas:
+      print("La marca objetivo no está en las clases del modelo.")
+      return 
+   for img_path in lista_imagenes:
+    try:
+      img = tf.keras.preprocessing.image.load_img(img_path, target_size=(224,224))
+      img = tf.keras.preprocessing.image.img_to_array(img)
 
+      img = preprocess_input(img)
+      img = np.expand_dims(img, axis=0)
+
+      pred= modelo_marca.predict(img)[0]
+      pred_idx = np.argmax(pred)
+      if pred_idx == objetivo_idx1:
+             resultados.append((img_path, pred[pred_idx]))
+             print(f"✔ MATCH — {img_path}  — {objetivo_marca} ({pred[pred_idx]:.3f})")
+      else:
+             print(f"✘ NO MATCH — {img_path}  — {marcas[pred_idx]} ({pred[pred_idx]:.3f})")
+    except Exception as e:
+      print(f"Error procesando {img_path}: {e}")
+
+
+   print("\n==== RESULTADOS ====")
+   if resultados:
+    for r, prob in resultados:
+     print(f"✔ {r} — {objetivo_marca} ({prob:.3f})")
+   else:
+        print("❌ Ninguna imagen coincide con esa marca")
 
 
 
@@ -148,7 +178,8 @@ while goku:
     print ("1. Entrenar modelo de marca (*)")
     print("2. Entrenar modelo de color (*)")
     print("3. Realizar predicción")
-    print("4. Salir")
+    print("4. Busqueda")
+    print("5. Salir")
     opcion = input("Selecciona una opción: ")
     match opcion:
         case "1":
@@ -193,13 +224,38 @@ while goku:
             
             
         case "4":
-            goku=False
-            print("chao!")
+            try:
+              modelo_marca = tf.keras.models.load_model("modelo_marca.h5")
+              #modelo_color = tf.keras.models.load_model("modelo_color.h5")
+            except Exception as e:
+                print(f"Error cargando el modelo: {e}")
+                continue
+            print("Modelos cargados correctamente.")
+            try:
+              with open("modelo_marca_clases.json", "r") as f:
+               marcas = json.load(f)
+               #with open("modelo_color_clases.json", "r") as f:
+                #color_class_names = json.load(f)
+            except:
+              print("No se encontró clases.json, no se puede interpretar las predicciones.")
+              continue
+            print("Clases.json cargadas correctamente.")
+            objetivo_marca = input("Ingrese la marca de auto a buscar: ")
+            lista_imagenes = {
+               "car.ai/cars_test/00025.jpg"
+                ,"car.ai/cars_test/00027.jpg"
+                ,"car.ai/cars_test/00029.jpg"
+                ,"car.ai/cars_test/00033.jpg"
+                ,"car.ai/cars_test/00039.jpg"
+                ,"car.ai/cars_test/00043.jpg"
+            }
+            buscar(modelo_marca,marcas,lista_imagenes,objetivo_marca)
+
         
         case "5":
-         print("DEBUG MODE ACTIVADO")
-         #verificarDatabase()
-         pred_test("car.ai/cars_test/00153.jpg")
+            goku=False
+            print("chao!")
+         
 
 
 
