@@ -64,7 +64,7 @@ def paginaAnalisis():
     #Yea ahora con el fondo nuevo, los labeles se ven feos, 
     #mejor incorporarlos dentro del mismo fondo
     titulo = tk.Label(analisisFrame, text="Inserte una imagen para comenzar ", font=("Arial", 20), bg="Black",fg="white")
-    titulo.pack(pady=10)
+    titulo.grid(row=1, column=3, padx=10, pady=10)
 
   
 
@@ -76,8 +76,8 @@ def paginaAnalisis():
 
    
 
-    mensaje_error = tk.Label(analisisFrame, text="", font=("Arial", 12), fg="red", bg="Black")
-    mensaje_error.pack(pady=5)
+    mensaje_error = tk.Label(analisisFrame, text="Holaa", font=("Arial", 12), fg="red", bg="Black")
+    mensaje_error.grid(row=15, column=3, padx=10, pady=10)
 
 
     # Función para generar boxplot
@@ -86,19 +86,23 @@ def paginaAnalisis():
 
     # Función para obtener imagen del Entry
     def guardar_imagen():
-       ruta=filedialog.askopenfilename(title="Seleccionar imagen", 
+         global img_analisis
+         ruta=filedialog.askopenfilename(title="Seleccionar imagen", 
         filetypes=[("Archivos de imagen", "*.png;*.jpg;*.jpeg;*.webp;*")])
-       if ruta:
+         if ruta:
             print("Imagen seleccionada:", ruta)
             img_analisis=ruta
-            return img_analisis
+            mensaje_error.config(text="Imagen cargada correctamente", fg="green")
+           
            
 
        
     def analizar_imagen():
+       mensaje_error.config(text="Comenzando analisis...", fg="white")
        if img_analisis =="":
           mensaje_error.config(text="Debes insertar una imagen", fg="red")
        else :
+          mensaje_error.config(text="Cargando modelos...", fg="white")
           print("Cargando modelos....")
           try:
            modelo_marca = tf.keras.models.load_model("modelo_marca.h5")
@@ -106,6 +110,7 @@ def paginaAnalisis():
            mensaje_error.config(text=f"Error cargando el modelo: {e}", fg="red")
            return
           print("Modelos cargados correctamente.")
+          mensaje_error.config(text="Cargando clases...", fg="white")
           print("Cargando clases....")
           try:
               with open("modelo_marca_clases.json", "r") as f:
@@ -126,6 +131,35 @@ def paginaAnalisis():
             print(f"{marcas[i]}: {pred1[i]:.3f}")
              
             print("Marca: ", marcas[np.argmax(pred1)])
+            pagina_resultados(img_analisis,marcas[np.argmax(pred1)])
+        
+    
+    def pagina_resultados(img_path,resultados):
+         for widget in main_frame.winfo_children():
+          widget.destroy()
+          
+         resultadosFrame = tk.Frame(main_frame, bg="white")
+         resultadosFrame.pack(fill="both", expand=True)
+         
+         titulo = tk.Label(resultadosFrame, text="Resultados del Análisis",
+                      font=("Arial", 22), fg="black",bg="white")
+         titulo.pack(pady=20)
+
+            # Cargar y mostrar la imagen analizada
+         img = Image.open(img_path)
+         img = img.resize((300, 300))
+         img = ImageTk.PhotoImage(img)
+         img_label = tk.Label(resultadosFrame, image=img, bg="white")
+         img_label.image = img
+         img_label.pack(pady=10)  # Mantener referencia
+            # Mostrar los resultados 
+         res_label = tk.Label(resultadosFrame,
+                         text=f"Resultado principal: {resultados}",
+                         font=("Arial", 16),
+                         bg="black",
+                         fg="cyan")
+         res_label.pack(pady=20)
+
 
 
 
@@ -139,12 +173,12 @@ def paginaAnalisis():
     
 
     boton_guardar = tk.Button(analisisFrame, text="Insertar imagen", command=guardar_imagen,width=25,height=3)
-    boton_guardar.grid(row=0, column=0, padx=10, pady=10)
+    boton_guardar.grid(row=10, column=300, padx=10, pady=10)
 
     crear_tooltip(boton_guardar, "Inserte una imagen para analizar")
 
     analizar_general= tk.Button(analisisFrame, text="¡Analizar Imagen!", command=analizar_imagen,width=25,height=3)
-    analizar_general.grid(row=0, column=1, padx=10, pady=10)
+    analizar_general.grid(row=12, column=300, padx=10, pady=10)
 
     crear_tooltip(analizar_general, "Analizar la imagen insertada con los modelos cargados")
 
@@ -152,6 +186,8 @@ def paginaAnalisis():
     
 
 def limpiarFrame():
+    global img_analisis
+    img_analisis=""
     for widget in main_frame.winfo_children():
         widget.destroy()
 
