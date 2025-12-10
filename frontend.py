@@ -1,10 +1,12 @@
 import tkinter as tk
 from tkinter import ttk
+from tkinter import filedialog
 from PIL import Image, ImageTk
 import json
 import tensorflow as tf
+from tensorflow.keras.applications.efficientnet import preprocess_input
 import numpy as np
-
+img_analisis=""
 main= tk.Tk()
 main.resizable(False, False)
 main.title("Proyecto 2 - Car.ai")
@@ -84,31 +86,67 @@ def paginaAnalisis():
 
     # Función para obtener imagen del Entry
     def guardar_imagen():
-       print("Funcionalidad no implementada aún.")
-        #empresa_input = combo_empresas.get()
-        #if empresa_input.strip() == "":
-            #mensaje_error.config(text="Debes ingresar una empresa")
-        #else:
-            #mensaje_error.config(text="")
-            #print("Empresa guardada:", empresa_input)
-            # Llamar a las funciones de graficado
+       ruta=filedialog.askopenfilename(title="Seleccionar imagen", 
+        filetypes=[("Archivos de imagen", "*.png;*.jpg;*.jpeg;*.webp;*")])
+       if ruta:
+            print("Imagen seleccionada:", ruta)
+            img_analisis=ruta
+            return img_analisis
            
-            
+
+       
+    def analizar_imagen():
+       if img_analisis =="":
+          mensaje_error.config(text="Debes insertar una imagen", fg="red")
+       else :
+          print("Cargando modelos....")
+          try:
+           modelo_marca = tf.keras.models.load_model("modelo_marca.h5")
+          except Exception as e:
+           mensaje_error.config(text=f"Error cargando el modelo: {e}", fg="red")
+           return
+          print("Modelos cargados correctamente.")
+          print("Cargando clases....")
+          try:
+              with open("modelo_marca_clases.json", "r") as f:
+                marcas = json.load(f)
+          except:
+              mensaje_error.config(text="No se encontró clases.json, no se puede interpretar las predicciones.", fg="red")
+              return
+          print("Clases cargadas correctamente.")
+          img = tf.keras.preprocessing.image.load_img(img_analisis, target_size=(224,224))
+          img = tf.keras.preprocessing.image.img_to_array(img)
+
+          img = preprocess_input(img) 
+
+          img = np.expand_dims(img, axis=0)
+          pred1 = modelo_marca.predict(img)[0]
+          top_idx = pred1.argsort()[-3:][::-1]
+          for i in top_idx:
+            print(f"{marcas[i]}: {pred1[i]:.3f}")
+             
+            print("Marca: ", marcas[np.argmax(pred1)])
+
+
+
+
+           
   
     
     
 
 
     
+
     boton_guardar = tk.Button(analisisFrame, text="Insertar imagen", command=guardar_imagen,width=25,height=3)
-    boton_guardar.pack(pady=5)
+    boton_guardar.grid(row=0, column=0, padx=10, pady=10)
 
     crear_tooltip(boton_guardar, "Inserte una imagen para analizar")
 
-    analizar_general= tk.Button(analisisFrame, text="¡Analizar todas las empresas!", command=analizar_general,width=25,height=3)
-    analizar_general.pack(pady=5)
+    analizar_general= tk.Button(analisisFrame, text="¡Analizar Imagen!", command=analizar_imagen,width=25,height=3)
+    analizar_general.grid(row=0, column=1, padx=10, pady=10)
 
-    crear_tooltip(analizar_general, "Realiza un análisis general de todas las empresas, mostrando MAD y outliers.")
+    crear_tooltip(analizar_general, "Analizar la imagen insertada con los modelos cargados")
 
     
     
