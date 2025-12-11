@@ -195,13 +195,13 @@ while goku:
             #entrenar_modelo(modelo, train_ds, val_ds,"modelo_color")
         case "3":
              try:
-              modelo_marca = tf.keras.models.load_model("modelo_marca.h5")
+              modelo_marca = tf.keras.models.load_model("modelo_marca_tipo.h5")
               #modelo_color = tf.keras.models.load_model("modelo_color.h5")
              except Exception as e:
                 print(f"Error cargando el modelo: {e}")
                 continue
              try:
-              with open("modelo_marca_clases.json", "r") as f:
+              with open("modelo_marca_tipo_clases.json", "r") as f:
                marcas = json.load(f)
                #with open("modelo_color_clases.json", "r") as f:
                 #color_class_names = json.load(f)

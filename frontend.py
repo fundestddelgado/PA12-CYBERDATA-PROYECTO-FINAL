@@ -105,7 +105,7 @@ def paginaAnalisis():
           mensaje_error.config(text="Cargando modelos...", fg="white")
           print("Cargando modelos....")
           try:
-           modelo_marca = tf.keras.models.load_model("modelo_marca.h5")
+           modelo_marca = tf.keras.models.load_model("modelo_marca_tipo.h5")
           except Exception as e:
            mensaje_error.config(text=f"Error cargando el modelo: {e}", fg="red")
            return
@@ -113,7 +113,7 @@ def paginaAnalisis():
           mensaje_error.config(text="Cargando clases...", fg="white")
           print("Cargando clases....")
           try:
-              with open("modelo_marca_clases.json", "r") as f:
+              with open("modelo_marca_tipo_clases.json", "r") as f:
                 marcas = json.load(f)
           except:
               mensaje_error.config(text="No se encontró clases.json, no se puede interpretar las predicciones.", fg="red")
