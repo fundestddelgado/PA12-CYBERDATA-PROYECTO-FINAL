@@ -7,13 +7,14 @@ import tensorflow as tf
 from tensorflow.keras.applications.efficientnet import preprocess_input
 import numpy as np
 img_analisis=""
+img_preview_label="Swerving Car Meme.png"
 main= tk.Tk()
 main.resizable(False, False)
 main.title("Proyecto 2 - Car.ai")
 main.geometry("1000x550")
-main.configure(bg="#F0F2F5")
-#icono = tk.PhotoImage(file="ProjectoSamPython/logoprueba2.PNG") 
-#main.iconphoto(True, icono)
+main.configure(bg="#F5F0F0")
+icono = tk.PhotoImage(file="icon_carai.png") 
+main.iconphoto(True, icono)
 
 
 # Función que se ejecuta al presionar Enter
@@ -26,7 +27,7 @@ def paginaHome():
     
 
     # Imagen de fondo
-    fondo = tk.PhotoImage(file="Swerving Car Meme.png")
+    fondo = tk.PhotoImage(file="Carailogohome.png")
     #placeholder temporal
     label_fondo = tk.Label(homeFrame, image=fondo)
     label_fondo.image = fondo  # Mantener referencia
@@ -41,7 +42,7 @@ def paginaAnalisis():
      tooltip = tk.Toplevel(widget)
      tooltip.withdraw()  # Oculto por defecto
      tooltip.overrideredirect(True)  # Sin bordes ni barra de título
-     label = tk.Label(tooltip, text=texto, background="cyan", relief="solid", borderwidth=1)
+     label = tk.Label(tooltip, text=texto, background="white", relief="solid", borderwidth=1)
      label.pack()
 
      def mostrar_tooltip(event):
@@ -55,7 +56,7 @@ def paginaAnalisis():
      widget.bind("<Leave>", ocultar_tooltip)
 
     # Primero creamos la foto con Pillow
-    fondoAnalisis = Image.open("AnalisisBg.png")
+    fondoAnalisis = Image.open("carworkshopbg.jpg")
     fondoAnalisis = fondoAnalisis.resize((1000, 700))
     fondoAnalisis = ImageTk.PhotoImage(fondoAnalisis)  
     label_fondo = tk.Label(analisisFrame, image=fondoAnalisis)
@@ -68,31 +69,37 @@ def paginaAnalisis():
 
   
 
-    #def listarEmpresas():
-        #print(data1.columns)
-        #empresas=data1["empresa"].unique().tolist()
-        #return empresas
+    preview_frame = tk.Frame(analisisFrame, bg="black", width=400, height=250)
+    preview_frame.grid(row=40, column=3, padx=5, pady=5)
+    preview_frame.grid_propagate(False) 
 
 
    
 
-    mensaje_error = tk.Label(analisisFrame, text="Holaa", font=("Arial", 12), fg="red", bg="Black")
-    mensaje_error.grid(row=15, column=3, padx=10, pady=10)
+    mensaje_error = tk.Label(analisisFrame, text="", font=("Arial", 12), fg="red", bg="Black")
+    mensaje_error.grid(row=30, column=3, padx=0, pady=0)
 
 
-    # Función para generar boxplot
+   
     
    
 
     # Función para obtener imagen del Entry
     def guardar_imagen():
-         global img_analisis
+         global img_analisis,img_preview_label
          ruta=filedialog.askopenfilename(title="Seleccionar imagen", 
         filetypes=[("Archivos de imagen", "*.png;*.jpg;*.jpeg;*.webp;*")])
          if ruta:
             print("Imagen seleccionada:", ruta)
             img_analisis=ruta
             mensaje_error.config(text="Imagen cargada correctamente", fg="green")
+        
+            img = Image.open(ruta)
+            img = img.resize((300, 300))
+            img_tk = ImageTk.PhotoImage(img)
+            img_preview_label = tk.Label(preview_frame, image=img_tk)
+            img_preview_label.image = img_tk  # Mantener referencia
+            img_preview_label.pack()
            
            
 
@@ -102,7 +109,6 @@ def paginaAnalisis():
        if img_analisis =="":
           mensaje_error.config(text="Debes insertar una imagen", fg="red")
        else :
-          mensaje_error.config(text="Cargando modelos...", fg="white")
           print("Cargando modelos....")
           try:
            modelo_marca = tf.keras.models.load_model("modelo_marca_tipo.h5")
@@ -110,7 +116,6 @@ def paginaAnalisis():
            mensaje_error.config(text=f"Error cargando el modelo: {e}", fg="red")
            return
           print("Modelos cargados correctamente.")
-          mensaje_error.config(text="Cargando clases...", fg="white")
           print("Cargando clases....")
           try:
               with open("modelo_marca_tipo_clases.json", "r") as f:
@@ -140,16 +145,21 @@ def paginaAnalisis():
           
          resultadosFrame = tk.Frame(main_frame, bg="white")
          resultadosFrame.pack(fill="both", expand=True)
-         
+         fondo = Image.open("carworkshopbg.jpg")
+         fondo = fondo.resize((1000, 700))
+         fondo = ImageTk.PhotoImage(fondo)  
+         label_fondo = tk.Label(resultadosFrame, image=fondo)
+         label_fondo.image = fondo  # Mantener referencia
+         label_fondo.place(x=0, y=0, relwidth=1, relheight=1)
          titulo = tk.Label(resultadosFrame, text="Resultados del Análisis",
-                      font=("Arial", 22), fg="black",bg="white")
+                      font=("Arial", 22), fg="white",bg="black")
          titulo.pack(pady=20)
 
             # Cargar y mostrar la imagen analizada
          img = Image.open(img_path)
          img = img.resize((300, 300))
          img = ImageTk.PhotoImage(img)
-         img_label = tk.Label(resultadosFrame, image=img, bg="white")
+         img_label = tk.Label(resultadosFrame, image=img, bg="black")
          img_label.image = img
          img_label.pack(pady=10)  # Mantener referencia
             # Mostrar los resultados 
@@ -159,6 +169,12 @@ def paginaAnalisis():
                          bg="black",
                          fg="cyan")
          res_label.pack(pady=20)
+         rescolor_label = tk.Label(resultadosFrame,
+                         text=f"Color: Azul",
+                            font=("Arial", 16),
+                            bg="black",
+                            fg="cyan")
+         rescolor_label.pack(pady=10)
 
 
 
@@ -173,14 +189,16 @@ def paginaAnalisis():
     
 
     boton_guardar = tk.Button(analisisFrame, text="Insertar imagen", command=guardar_imagen,width=25,height=3)
-    boton_guardar.grid(row=10, column=300, padx=10, pady=10)
+    boton_guardar.grid(row=40, column=250, padx=0, pady=0)
 
     crear_tooltip(boton_guardar, "Inserte una imagen para analizar")
 
     analizar_general= tk.Button(analisisFrame, text="¡Analizar Imagen!", command=analizar_imagen,width=25,height=3)
-    analizar_general.grid(row=12, column=300, padx=10, pady=10)
+    analizar_general.grid(row=60, column=250, padx=5, pady=5)
 
     crear_tooltip(analizar_general, "Analizar la imagen insertada con los modelos cargados")
+
+    
 
     
     
@@ -198,7 +216,7 @@ def limpiarIndicadores():
 
 def indicador(lbl,pagina):
     limpiarIndicadores()
-    lbl.config(bg="RoyalBlue")
+    lbl.config(bg="red")
     limpiarFrame()
     pagina()
 
@@ -223,10 +241,10 @@ salirBotton=tk.Button(opcionFrame,text="Salir",font=("Arial", 15),fg="white",bd=
 salirBotton.place(x=20,y=450)
 #Atributos del frame de opciones
 opcionFrame.pack(side="left")
-#logo = tk.PhotoImage(file="ProjectoSamPython/cybersentinelLogo.png")
-#logoChico = logo.subsample(4, 5)  # Ajusta los valores según el tamaño deseado
-#logo_label = tk.Label(opcionFrame, image=logoChico, bg="black")
-#logo_label.place(x=1, y=5)
+logo = tk.PhotoImage(file="Car.ai_Logo_1-removebg.png")
+logoChico = logo.subsample(6, 7)  # Ajusta los valores según el tamaño deseado
+logo_label = tk.Label(opcionFrame, image=logoChico, bg="black")
+logo_label.place(x=1, y=5)
 opcionFrame.pack_propagate(False)
 opcionFrame.config(width=145,height=700)
 #Atributos del frame principal
