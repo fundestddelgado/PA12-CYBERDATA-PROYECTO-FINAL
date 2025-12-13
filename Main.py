@@ -196,7 +196,7 @@ while goku:
         case "3":
              try:
               modelo_marca = tf.keras.models.load_model("modelo_marca_tipo.h5")
-              modelo_color = tf.keras.models.load_model("model.weights.h5")
+              #modelo_color = tf.keras.models.load_model("model.weights.h5")
              except Exception as e:
                 print(f"Error cargando el modelo: {e}")
                 continue
@@ -216,13 +216,13 @@ while goku:
 
              img = np.expand_dims(img, axis=0)
              pred1 = modelo_marca.predict(img)[0]
-             pred2 = modelo_color.predict(img)[0]
+             #pred2 = modelo_color.predict(img)[0]
              top_idx = pred1.argsort()[-3:][::-1]
              for i in top_idx:
               print(f"{marcas[i]}: {pred1[i]:.3f}")
              
              print("Marca: ", marcas[np.argmax(pred1)])
-             print("Color: ", color_class_names[np.argmax(pred2)])
+             #print("Color: ", color_class_names[np.argmax(pred2)])
             
             
         case "4":
