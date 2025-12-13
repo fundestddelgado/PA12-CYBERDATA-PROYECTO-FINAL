@@ -169,12 +169,12 @@ def paginaAnalisis():
                          bg="black",
                          fg="cyan")
          res_label.pack(pady=20)
-         rescolor_label = tk.Label(resultadosFrame,
-                         text=f"Color: Azul",
-                            font=("Arial", 16),
-                            bg="black",
-                            fg="cyan")
-         rescolor_label.pack(pady=10)
+         #rescolor_label = tk.Label(resultadosFrame,
+        #                 text=f"Color: Azul",
+         #                   font=("Arial", 16),
+         #                   bg="black",
+          #                  fg="cyan")
+         #rescolor_label.pack(pady=10)
 
 
 
