@@ -1,2 +1,2 @@
-.env
-#Por nada del mundo la llave de api se subira al repositorio
+API_KEY.env
+#Aunque la llave es gratuita, es una buena práctica no subirla a repositorios públicos.

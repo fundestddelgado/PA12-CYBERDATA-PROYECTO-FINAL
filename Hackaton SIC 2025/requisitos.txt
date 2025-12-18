@@ -1,0 +1,7 @@
+El siguiente codigo require de las siguientes librerias para funcionar: 
+1. streamlit
+2. -U google-generativeai
+3. python-dotenv
+
+
+Utilicen pip install para instalarlas antes de correr el programa
